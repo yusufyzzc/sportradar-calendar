@@ -60,3 +60,19 @@ class Event(models.Model):
         if self.title:
             return self.title
         return f"{self._home_team} vs {self._away_team} - {self.event_date}"
+
+    @property
+    def sport(self):
+        return self._sport
+
+    @property
+    def home_team(self):
+        return self._home_team
+
+    @property
+    def away_team(self):
+        return self._away_team
+
+    @property
+    def venue(self):
+        return self._venue

@@ -1,10 +1,9 @@
 from django.shortcuts import render, get_object_or_404
 from django.http import JsonResponse
-from .models import Event
-import json
 from django.views.decorators.csrf import csrf_exempt
-from .models import Sport, Team, Venue
-
+from django.shortcuts import render, redirect
+from .models import Event, Sport, Team, Venue
+import json
 
 def get_events(request):
     events = Event.objects.select_related(
@@ -77,3 +76,53 @@ def create_event(request):
         return JsonResponse({"message": "Event created", "id": event.id})
 
     return JsonResponse({"error": "Invalid request"}, status=400)
+
+def event_list_page(request):
+    events = Event.objects.select_related(
+        "_sport", "_home_team", "_away_team", "_venue"
+    ).all().order_by("event_date", "event_time")
+
+    return render(request, "calendar_app/event_list.html", {"events": events})
+
+
+def event_detail_page(request, event_id):
+    event = get_object_or_404(
+        Event.objects.select_related(
+            "_sport", "_home_team", "_away_team", "_venue"
+        ),
+        id=event_id
+    )
+
+    return render(request, "calendar_app/event_detail.html", {"event": event})
+
+
+def add_event_page(request):
+    if request.method == "POST":
+        sport = Sport.objects.get(id=request.POST["sport_id"])
+        home_team = Team.objects.get(id=request.POST["home_team_id"])
+        away_team = Team.objects.get(id=request.POST["away_team_id"])
+
+        venue = None
+        venue_id = request.POST.get("venue_id")
+        if venue_id:
+            venue = Venue.objects.get(id=venue_id)
+
+        Event.objects.create(
+            title=request.POST.get("title", ""),
+            event_date=request.POST["event_date"],
+            event_time=request.POST["event_time"],
+            description=request.POST.get("description", ""),
+            _sport=sport,
+            _home_team=home_team,
+            _away_team=away_team,
+            _venue=venue,
+        )
+
+        return redirect("event_list_page")
+
+    context = {
+        "sports": Sport.objects.all(),
+        "teams": Team.objects.all(),
+        "venues": Venue.objects.all(),
+    }
+    return render(request, "calendar_app/event_form.html", context)

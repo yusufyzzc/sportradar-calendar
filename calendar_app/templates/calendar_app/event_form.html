@@ -1,0 +1,68 @@
+{% extends "calendar_app/base.html" %}
+
+{% block content %}
+<h1>Add Event</h1>
+
+<form method="post">
+    {% csrf_token %}
+
+    <div>
+        <label for="title">Title</label>
+        <input type="text" name="title" id="title" required>
+    </div>
+
+    <div>
+        <label for="event_date">Date</label>
+        <input type="date" name="event_date" id="event_date" required>
+    </div>
+
+    <div>
+        <label for="event_time">Time</label>
+        <input type="time" name="event_time" id="event_time" required>
+    </div>
+
+    <div>
+        <label for="sport_id">Sport</label>
+        <select name="sport_id" id="sport_id" required>
+            {% for sport in sports %}
+            <option value="{{ sport.id }}">{{ sport.name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div>
+        <label for="home_team_id">Home Team</label>
+        <select name="home_team_id" id="home_team_id" required>
+            {% for team in teams %}
+            <option value="{{ team.id }}">{{ team.name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div>
+        <label for="away_team_id">Away Team</label>
+        <select name="away_team_id" id="away_team_id" required>
+            {% for team in teams %}
+            <option value="{{ team.id }}">{{ team.name }}</option>
+            {% endfor %}
+        </select>
+            </div>
+
+    <div>
+        <label for="venue_id">Venue</label>
+        <select name="venue_id" id="venue_id">
+            <option value="">---------</option>
+            {% for venue in venues %}
+            <option value="{{ venue.id }}">{{ venue.name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div>
+        <label for="description">Description</label>
+        <textarea name="description" id="description" rows="4"></textarea>
+    </div>
+
+    <button class="btn" type="submit">Create Event</button>
+</form>
+{% endblock %}
